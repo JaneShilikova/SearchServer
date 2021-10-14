@@ -59,8 +59,8 @@ enum class DocumentStatus {
 
 class SearchServer {
 public:
-	int GetDocumentCount() const {
-	    return documents_.size();
+    int GetDocumentCount() const {
+        return documents_.size();
 	}
 
     void SetStopWords(const string& text) {
@@ -84,9 +84,9 @@ public:
 
     vector<Document> FindTopDocuments(const string& raw_query, DocumentStatus input_status = DocumentStatus::ACTUAL) const {
         return FindTopDocuments(raw_query,
-        		[input_status](int document_id, DocumentStatus status, int rating) {
-        		    return status == input_status;
-        		});
+            [input_status](int document_id, DocumentStatus status, int rating) {
+                return status == input_status;
+            });
     }
 
     template <typename Comparator>
@@ -95,14 +95,14 @@ public:
         auto matched_documents = FindAllDocuments(query);
 
         sort(matched_documents.begin(), matched_documents.end(),
-        		[](const Document& lhs, const Document& rhs) {
-        			if (abs(lhs.relevance - rhs.relevance) < 1e-6) {
-        				return lhs.rating > rhs.rating;
-        			}
-        			else {
-        				return lhs.relevance > rhs.relevance;
-        			}
-             	 });
+            [](const Document& lhs, const Document& rhs) {
+                if (abs(lhs.relevance - rhs.relevance) < 1e-6) {
+                    return lhs.rating > rhs.rating;
+                }
+                else {
+                    return lhs.relevance > rhs.relevance;
+                }
+            });
         //filtered - documents after comparator
         vector<Document> filtered_documents;
         for (auto elem : matched_documents)
@@ -287,9 +287,9 @@ int main() {
 
     cout << "Even ids:"s << endl;
     for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s,
-    		[](int document_id, DocumentStatus status, int rating) {
-    		    return document_id % 2 == 0;
-    		})) {
+        [](int document_id, DocumentStatus status, int rating) {
+            return document_id % 2 == 0;
+        })) {
         PrintDocument(document);
     }
     return 0;;
