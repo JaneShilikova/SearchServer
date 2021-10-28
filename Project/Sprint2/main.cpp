@@ -1,14 +1,9 @@
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 #include <map>
 #include <set>
-#include <string>
-#include <utility>
 #include <vector>
-#include <cstdlib>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
 
 using namespace std;
 
@@ -420,32 +415,71 @@ void TestMatchingDocuments() {
 void TestSortDocuments() {
     const int doc_id = 42;
     const string content = "cat in the city"s;
-    const vector<int> ratings = {1, 2, 3};
+    const vector<int> ratings = {2, 8, -3};
 
     const int doc_id2 = 41;
     const string content2 = "dog on the carpet"s;
-    const vector<int> ratings2 = {1, -2, 3};
+    const vector<int> ratings2 = {3, 7, 2, 7};
+
+    const int doc_id3 = 40;
+    const string content3 = "sister in the kitchen"s;
+    const vector<int> ratings3 = {4, 5, -12, 2, 1};
     SearchServer server;
     server.AddDocument(doc_id, content, DocumentStatus::ACTUAL, ratings);
     server.AddDocument(doc_id2, content2, DocumentStatus::ACTUAL, ratings2);
+    server.AddDocument(doc_id3, content3, DocumentStatus::ACTUAL, ratings3);
     const auto found_docs = server.FindTopDocuments("the"s);
-    ASSERT_HINT(found_docs[0].rating > found_docs[1].rating,
-        "Founded documents must be sorted by descending rating"s);
+    ASSERT_EQUAL(found_docs.size(), 3u);
+    bool result = is_sorted(found_docs.begin(), found_docs.end(),
+        [](const Document& doc1, const Document& doc2) {
+    	    if (abs(doc1.relevance - doc2.relevance) < 1e-6) {
+    	        return doc1.rating > doc2.rating;
+            }
+    	    else {
+    	        return doc1.relevance > doc2.relevance;
+    	    }
+        });
+    ASSERT_HINT(result, "Founded documents must be sorted by descending rating and relevance"s);
 }
 
 void TestComputeAverageRating() {
     const int doc_id = 42;
     const string content = "cat in the city"s;
-    const vector<int> ratings = {1, 2, 3};
+    const vector<int> ratings = {2, 8, -3};
+
+    const int doc_id2 = 41;
+    const string content2 = "dog on the carpet"s;
+    const vector<int> ratings2 = {3, 7, 2, 7};
+
+    const int doc_id3 = 40;
+    const string content3 = "sister in the kitchen"s;
+    const vector<int> ratings3 = {4, 5, -12, 2, 1};
+
     SearchServer server;
     server.AddDocument(doc_id, content, DocumentStatus::ACTUAL, ratings);
-    const auto found_docs = server.FindTopDocuments("cat"s);
+    server.AddDocument(doc_id2, content2, DocumentStatus::ACTUAL, ratings2);
+    server.AddDocument(doc_id3, content3, DocumentStatus::ACTUAL, ratings3);
+    const auto found_docs = server.FindTopDocuments("the"s);
     int rating_sum = 0;
     for (const int rating : ratings) {
         rating_sum += rating;
     }
     int rating = rating_sum / static_cast<int>(ratings.size());
+    ASSERT(found_docs[1].rating == rating);
+
+    rating_sum = 0;
+    for (const int rating : ratings2) {
+        rating_sum += rating;
+    }
+    rating = rating_sum / static_cast<int>(ratings2.size());
     ASSERT(found_docs[0].rating == rating);
+
+    rating_sum = 0;
+    for (const int rating : ratings3) {
+        rating_sum += rating;
+    }
+    rating = rating_sum / static_cast<int>(ratings3.size());
+    ASSERT(found_docs[2].rating == rating);
 }
 
 void TestFilterPredicate() {
@@ -489,7 +523,14 @@ void TestRelevanceDocument() {
     SearchServer server;
     server.AddDocument(doc_id, content, DocumentStatus::ACTUAL, ratings);
     const auto found_docs = server.FindTopDocuments("cat"s);
-    ASSERT(found_docs[0].relevance == 0);
+
+    const double inv_word_count = 1.0 / content.size();
+    double freq = 0;
+    vector<string> words = SplitIntoWords(content);
+    for (const string& word : words)
+        freq += inv_word_count;
+    double relevance = freq * log(server.GetDocumentCount() * 1.0 / 1);
+    ASSERT(found_docs[0].relevance == relevance);
 }
 
 // TestSearchServer - entry point for running module tests
