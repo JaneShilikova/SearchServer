@@ -496,7 +496,6 @@ void TestFilterPredicate() {
     const auto found_docs = server.FindTopDocuments("the"s,
         [](int document_id, DocumentStatus status, int rating) {
             return document_id % 2 == 0;
-            cout << static_cast<int>(status) << rating;
         });
     ASSERT_EQUAL(found_docs[0].id, doc_id);
 }
