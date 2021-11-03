@@ -44,7 +44,7 @@ vector<string> SplitIntoWords(const string& text) {
 }
 
 struct Document {
-	Document() = default;
+    Document() = default;
 
     Document(int id_doc, double rel, int rat) : id(id_doc), relevance(rel), rating(rat) { }
 
@@ -62,23 +62,23 @@ enum class DocumentStatus {
 
 class SearchServer {
 public:
-	// defines an invalid document id
-	inline static constexpr int INVALID_DOCUMENT_ID = -1;
+    // defines an invalid document id
+    inline static constexpr int INVALID_DOCUMENT_ID = -1;
 
-	template <typename StringContainer>
-	explicit SearchServer(const StringContainer& stop_words) {
-		for (const string& word : stop_words) {
-		    if (!IsValidWord(word)) {
-		        throw invalid_argument("Stop word contains invalid symbol"s);
-		    }
-		    if (!word.empty()) {
-		        stop_words_.insert(word);
-		    }
-		}
-	}
+    template <typename StringContainer>
+    explicit SearchServer(const StringContainer& stop_words) {
+        for (const string& word : stop_words) {
+            if (!IsValidWord(word)) {
+                throw invalid_argument("Stop word contains invalid symbol"s);
+            }
+            if (!word.empty()) {
+                stop_words_.insert(word);
+            }
+        }
+    }
 
-	explicit SearchServer(const string& stop_words_text)
-	    : SearchServer(SplitIntoWords(stop_words_text)) { }
+    explicit SearchServer(const string& stop_words_text)
+        : SearchServer(SplitIntoWords(stop_words_text)) { }
 
     int GetDocumentCount() const {
         return documents_.size();
@@ -87,8 +87,7 @@ public:
     int GetDocumentId(int index) const {
     	try {
     		return document_ids_.at(index);
-    	    }
-    	catch (const exception& e) {
+    	} catch (const exception& e) {
     		cout << "Error getting document id = "s << index << ": "s << e.what() << endl;
     		return INVALID_DOCUMENT_ID;
     	}
@@ -612,7 +611,7 @@ void PrintMatchDocumentResult(int document_id, const vector<string>& words, Docu
 }
 
 void AddDocument(SearchServer& search_server, int document_id, const string& document, DocumentStatus status,
-                 const vector<int>& ratings) {
+    const vector<int>& ratings) {
     try {
         search_server.AddDocument(document_id, document, status, ratings);
     } catch (const exception& e) {
@@ -646,7 +645,7 @@ void MatchDocuments(const SearchServer& search_server, const string& query) {
 }
 
 int main() {
-	TestSearchServer();
+    TestSearchServer();
     SearchServer search_server("и в на"s);
 
     AddDocument(search_server, 1, "пушистый кот пушистый хвост"s, DocumentStatus::ACTUAL, {7, 2, 7});
