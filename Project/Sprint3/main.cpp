@@ -82,15 +82,15 @@ public:
 
     int GetDocumentCount() const {
         return documents_.size();
-	}
+    }
 
     int GetDocumentId(int index) const {
-    	try {
-    		return document_ids_.at(index);
-    	} catch (const exception& e) {
-    		cout << "Error getting document id = "s << index << ": "s << e.what() << endl;
-    		return INVALID_DOCUMENT_ID;
-    	}
+        try {
+            return document_ids_.at(index);
+        } catch (const exception& e) {
+            cout << "Error getting document id = "s << index << ": "s << e.what() << endl;
+            return INVALID_DOCUMENT_ID;
+        }
     }
 
     void AddDocument(int document_id, const string& document, DocumentStatus status, const vector<int>& ratings) {
