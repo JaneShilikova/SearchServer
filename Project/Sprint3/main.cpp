@@ -62,9 +62,6 @@ enum class DocumentStatus {
 
 class SearchServer {
 public:
-    // defines an invalid document id
-    inline static constexpr int INVALID_DOCUMENT_ID = -1;
-
     template <typename StringContainer>
     explicit SearchServer(const StringContainer& stop_words) {
         for (const string& word : stop_words) {
@@ -85,12 +82,7 @@ public:
     }
 
     int GetDocumentId(int index) const {
-        try {
-            return document_ids_.at(index);
-        } catch (const exception& e) {
-            cout << "Error getting document id = "s << index << ": "s << e.what() << endl;
-            return INVALID_DOCUMENT_ID;
-        }
+        return document_ids_.at(index);
     }
 
     void AddDocument(int document_id, const string& document, DocumentStatus status, const vector<int>& ratings) {
