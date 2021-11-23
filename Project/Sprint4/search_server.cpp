@@ -21,10 +21,10 @@ void SearchServer::AddDocument(int document_id, const string& document, Document
     }
     document_ids_.push_back(document_id);
     documents_.emplace(document_id,
-    		SearchServer::DocumentData {
-    	    SearchServer::ComputeAverageRating(ratings),
-            status
-        });
+        SearchServer::DocumentData {
+        SearchServer::ComputeAverageRating(ratings),
+        status
+    });
 }
 
 vector<Document> SearchServer::FindTopDocuments(const string& raw_query, DocumentStatus input_status) const {
@@ -72,7 +72,7 @@ vector<string> SearchServer::SplitIntoWordsNoStop(const string& text) const {
     vector<string> words;
     for (const string& word : SplitIntoWords(text)) {
         if (!IsValidWord(word)) {
-        	throw invalid_argument("Invalid symbol"s);
+            throw invalid_argument("Invalid symbol"s);
         }
         if (!IsStopWord(word)) {
             words.push_back(word);
@@ -113,7 +113,7 @@ SearchServer::QueryWord SearchServer::ParseQueryWord(string text) const {
 }
 
 SearchServer::Query SearchServer::ParseQuery(const string& text) const {
-	SearchServer::Query query;
+    SearchServer::Query query;
     for (const string& word : SplitIntoWords(text)) {
         const SearchServer::QueryWord query_word = SearchServer::ParseQueryWord(word);
         if (!query_word.is_stop) {
