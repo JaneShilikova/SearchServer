@@ -19,30 +19,28 @@ public:
 
 private:
     struct QueryResult {
-        QueryResult(bool res) : no_result(res) { }
+        QueryResult(std::string query, int docs) : raw_query(query), count_documents(docs) { }
 
-        bool no_result = false;
+        std::string raw_query;
+        int count_documents = 0;
     };
 
+    void Add(std::string query, int docs);
+
+    void Remove();
+
+    void Update(std::string query, std::vector<Document> docs);
+
+private:
     std::deque<QueryResult> requests_;
     int no_result_requests = 0;
     const SearchServer& search_server_;
-    int curr_minutes = 0;
+    const int minutes_per_day = 1440;
 };
 
 template <typename DocumentPredicate>
 std::vector<Document> RequestQueue::AddFindRequest(const std::string& raw_query, DocumentPredicate document_predicate) {
-    ++curr_minutes;
-    if (curr_minutes == 1441) {
-        if (requests_.front().no_result)
-            --no_result_requests;
-        requests_.pop_front();
-        --curr_minutes;
-    }
     auto res = search_server_.FindTopDocuments(raw_query, document_predicate);
-    bool flag = res.empty();
-    if (flag)
-        ++no_result_requests;
-    requests_.push_back(QueryResult(flag));
+    Update(raw_query, res);
     return res;
 }
