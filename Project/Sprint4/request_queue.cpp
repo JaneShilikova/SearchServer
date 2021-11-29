@@ -12,13 +12,13 @@ int RequestQueue::GetNoResultRequests() const {
     return no_result_requests;
 }
 
-void RequestQueue::Add(string query, int docs) {
-    if (docs == 0)
+void RequestQueue::Add_QueryResult(string query, int count_docs) {
+    if (count_docs == 0)
         ++no_result_requests;
-    requests_.push_back(QueryResult(query, docs));
+    requests_.push_back(QueryResult(query, count_docs));
 }
 
-void RequestQueue::Remove() {
+void RequestQueue::Remove_QueryResult() {
     if (requests_.size() > minutes_per_day) {
         if (requests_.front().count_documents == 0)
             --no_result_requests;
@@ -27,6 +27,6 @@ void RequestQueue::Remove() {
 }
 
 void RequestQueue::Update(string query, vector<Document> docs) {
-    Add(query, docs.size());
-    Remove();
+    Add_QueryResult(query, docs.size());
+    Remove_QueryResult();
 }
