@@ -7,17 +7,18 @@ int SearchServer::GetDocumentCount() const {
 }
 
 const std::map<std::string, double>& SearchServer::GetWordFrequencies(int document_id) const {
+    static const map<string, double> no_documents_;
     if (document_to_word_freqs_.count(document_id))
         return document_to_word_freqs_.at(document_id);
     else
         return no_documents_;
 }
 
-std::vector<int>::const_iterator SearchServer::begin() const {
+std::set<int>::const_iterator SearchServer::begin() const {
     return document_ids_.begin();
 }
 
-std::vector<int>::const_iterator SearchServer::end() const {
+std::set<int>::const_iterator SearchServer::end() const {
     return document_ids_.end();
 }
 
@@ -31,7 +32,7 @@ void SearchServer::AddDocument(int document_id, const string& document, Document
         word_to_document_freqs_[word][document_id] += inv_word_count;
         document_to_word_freqs_[document_id][word] += inv_word_count;
     }
-    document_ids_.push_back(document_id);
+    document_ids_.insert(document_id);
     documents_.emplace(document_id,
         SearchServer::DocumentData {
         SearchServer::ComputeAverageRating(ratings),
@@ -44,17 +45,23 @@ void SearchServer::RemoveDocument(int document_id) {
     auto it = word_to_document_freqs_.begin();
     while (it != word_to_document_freqs_.end()) {
         map<int, double> doc_freqs = it->second;
-        if (doc_freqs.count(document_id))
+        if (doc_freqs.count(document_id)) {
+        	doc_freqs.erase(document_id);
             it = word_to_document_freqs_.erase(it);
+        }
         else
             ++it;
     }
     //remove from document_to_word_freqs_
-    document_to_word_freqs_.erase(document_id);
+    if (document_to_word_freqs_.count(document_id)) {
+    	map<string, double> word_freqs = document_to_word_freqs_.at(document_id);
+        word_freqs.erase(word_freqs.begin(), word_freqs.end());
+        document_to_word_freqs_.erase(document_id);
+    }
     //remove from documents_
     documents_.erase(document_id);
     //remove from document_ids_
-    document_ids_.erase(remove(document_ids_.begin(), document_ids_.end(), document_id), document_ids_.end());
+    document_ids_.erase(document_id);
 }
 
 vector<Document> SearchServer::FindTopDocuments(const string& raw_query, DocumentStatus input_status) const {
