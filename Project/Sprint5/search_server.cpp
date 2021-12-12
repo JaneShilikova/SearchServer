@@ -46,7 +46,7 @@ void SearchServer::RemoveDocument(int document_id) {
     while (it != word_to_document_freqs_.end()) {
         map<int, double> doc_freqs = it->second;
         if (doc_freqs.count(document_id)) {
-        	doc_freqs.erase(document_id);
+            doc_freqs.erase(document_id);
             it = word_to_document_freqs_.erase(it);
         }
         else
