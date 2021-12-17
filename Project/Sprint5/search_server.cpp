@@ -8,10 +8,12 @@ int SearchServer::GetDocumentCount() const {
 
 const std::map<std::string, double>& SearchServer::GetWordFrequencies(int document_id) const {
     static const map<string, double> no_documents_;
-    if (document_to_word_freqs_.count(document_id))
+    if (document_to_word_freqs_.count(document_id)) {
         return document_to_word_freqs_.at(document_id);
-    else
+    }
+    else {
         return no_documents_;
+    }
 }
 
 std::set<int>::const_iterator SearchServer::begin() const {
@@ -42,24 +44,16 @@ void SearchServer::AddDocument(int document_id, const string& document, Document
 
 void SearchServer::RemoveDocument(int document_id) {
     //remove from word_to_document_freqs_
-    auto it = word_to_document_freqs_.begin();
-    while (it != word_to_document_freqs_.end()) {
-        map<int, double> doc_freqs = it->second;
-        if (doc_freqs.count(document_id)) {
-            doc_freqs.erase(document_id);
-            it = word_to_document_freqs_.erase(it);
-        }
-        else
-            ++it;
+    for (auto& [word, freq] : document_to_word_freqs_.at(document_id)) {
+        word_to_document_freqs_[word].erase(document_id);
     }
+
     //remove from document_to_word_freqs_
-    if (document_to_word_freqs_.count(document_id)) {
-    	map<string, double> word_freqs = document_to_word_freqs_.at(document_id);
-        word_freqs.erase(word_freqs.begin(), word_freqs.end());
-        document_to_word_freqs_.erase(document_id);
-    }
+    document_to_word_freqs_.erase(document_id);
+
     //remove from documents_
     documents_.erase(document_id);
+
     //remove from document_ids_
     document_ids_.erase(document_id);
 }
