@@ -13,8 +13,9 @@ int RequestQueue::GetNoResultRequests() const {
 }
 
 void RequestQueue::Add_QueryResult(string query, int count_docs) {
-    if (count_docs == 0)
+    if (count_docs == 0) {
         ++no_result_requests;
+    }
     requests_.push_back(QueryResult(query, count_docs));
 }
 
